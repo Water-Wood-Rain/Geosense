@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</title>
-    <style>
+    <title>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</title> <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #fafafa; }
         h1, h2, h3 { color: #2c3e50; text-align: center; }
         h1 { font-size: 2.5em; margin-bottom: 10px; }
@@ -24,13 +23,11 @@
 </head>
 <body>
 
-    <h1>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning [cite: 44]</h1>
+    <h1>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</h1>
     <div class="authors">
-        Anonymous Authors [cite: 46]
-    </div>
+        Anonymous Authors </div>
     <div class="conference">
-        Under review by the International Conference on Machine Learning (ICML) 2026 [cite: 70]
-    </div>
+        Under review by the International Conference on Machine Learning (ICML) 2026 </div>
 
     <div class="links">
         <a href="#">📝 Paper (PDF)</a>
@@ -39,43 +36,40 @@
     </div>
 
     <div class="figure">
-        <img src="static/images/teaser.png" alt="Adaptive Geometric Reasoning with GeoSense">
-        <figcaption>Figure 1: Adaptive Geometric Reasoning with GeoSense. GeoSense introduces an adaptive mechanism that requests geometric features only when necessary[cite: 90, 91].</figcaption>
+        <img src="static/figure1-6pdf.svg" alt="Adaptive Geometric Reasoning with GeoSense">
+        <figcaption>Figure 1: Adaptive Geometric Reasoning with GeoSense. GeoSense introduces an adaptive mechanism that requests geometric features only when necessary. </figcaption>
     </div>
 
     <div class="section">
         <h2>Abstract</h2>
         <p class="abstract-text">
-            Advancing towards artificial superintelligence requires rich and intelligent perceptual capabilities[cite: 47]. A critical frontier in this pursuit is overcoming the limited spatial understanding of Multimodal Large Language Models (MLLMs), where geometry information is essential[cite: 48]. Existing methods often address this by rigidly injecting geometric signals into every input, while ignoring their necessity and adding computation overhead[cite: 49]. 
-        </p>
+            Advancing towards artificial superintelligence requires rich and intelligent perceptual capabilities. A critical frontier in this pursuit is overcoming the limited spatial understanding of Multimodal Large Language Models (MLLMs), where geometry information is essential. Existing methods often address this by rigidly injecting geometric signals into every input, while ignoring their necessity and adding computation overhead. </p>
         <p class="abstract-text">
-            Contrary to this paradigm, our framework endows the model with an awareness of perceptual insufficiency, empowering it to autonomously engage geometric features in reasoning when 2D cues are deemed insufficient[cite: 50]. To achieve this, we first introduce an independent geometry input channel to the model architecture and conduct alignment training[cite: 51]. Subsequently, we curate a dedicated spatial-aware supervised fine-tuning dataset to activate the model's latent internal cues[cite: 52, 53]. Experiments across multiple spatial reasoning benchmarks demonstrate significant spatial gains without compromising 2D visual reasoning capabilities[cite: 54].
-        </p>
+            Contrary to this paradigm, our framework endows the model with an awareness of perceptual insufficiency, empowering it to autonomously engage geometric features in reasoning when 2D cues are deemed insufficient. To achieve this, we first introduce an independent geometry input channel to the model architecture and conduct alignment training, enabling the effective utilization of geometric features. Subsequently, to endow the model with perceptual awareness, we curate a dedicated spatial-aware supervised fine-tuning dataset. This serves to activate the model's latent internal cues, empowering it to autonomously determine the necessity of geometric information. Experiments across multiple spatial reasoning benchmarks validate this approach, demonstrating significant spatial gains without compromising 2D visual reasoning capabilities, offering a path toward more robust, efficient and self-aware multi-modal intelligence. </p>
     </div>
 
     <div class="section">
         <h2>Methodology</h2>
         <p>
-            GeoSense dynamically modulates its reliance on geometry input[cite: 168]. The training framework consists of two main stages:
+            GeoSense dynamically modulates its reliance on geometry input. The training framework consists of two main stages:
         </p>
         <ul>
-            <li><strong>Independent Geometry Adaptation:</strong> We treat 3D geometry as an independent, on-demand modality rather than fusing it via element-wise summation[cite: 269]. Both visual and geometric encoders extract features, which are then projected via dedicated MLP modules to a shared embedding space[cite: 271, 272].</li>
-            <li><strong>Activating Internal Spatial Awareness:</strong> During inference, the model dynamically makes an "Internal Sense Decision" based on the 2D visual and textual prompt[cite: 298]. For tasks requiring high spatial precision, the model is trained to trigger a signal (e.g., the <code>&lt;vggt&gt;</code> token) to request geometric embeddings[cite: 299, 373]. If the signal is not triggered, the channel is suppressed to maintain 2D visual reasoning purity[cite: 377].</li>
+            <li><strong>Independent Geometry Adaptation:</strong> We treat 3D geometry as an independent, on-demand modality. Both encoders extract features which are projected via dedicated MLP modules to a shared embedding space. </li>
+            <li><strong>Activating Internal Spatial Awareness:</strong> The model is trained to function as an adaptive cognitive gate. The model learns to dynamically evaluate visual input and the task intent. For tasks requiring high spatial precision, the model is trained to trigger a signal, i.e., <code>&lt;vggt&gt;</code>, to request geometric embeddings. If the signal is not triggered, the model suppresses the channel to maintain 2D visual reasoning purity. </li>
         </ul>
         <div class="figure">
-            <img src="static/images/architecture.png" alt="Architectural Overview of GeoSense">
-            <figcaption>Figure 2: Architectural Overview of GeoSense. We integrate a 3D visual geometry encoder alongside a standard 2D visual encoder[cite: 296].</figcaption>
+            <img src="static/figure2pdf.svg" alt="Architectural Overview of GeoSense">
+            <figcaption>Figure 2: Architectural Overview of GeoSense. We integrate a 3D visual geometry encoder alongside a standard 2D visual encoder. </figcaption>
         </div>
     </div>
 
     <div class="section">
         <h2>Key Results</h2>
         <p>
-            Our proposed model significantly outperforms the baseline Qwen2.5-VL-3B on spatial reasoning benchmarks under comparable training data scales[cite: 559]. 
-        </p>
+            Our proposed model significantly outperforms the baseline Qwen2.5-VL-3B on spatial reasoning benchmarks under comparable training data scales. </p>
         <ul>
-            <li><strong>Spatial Reasoning:</strong> GeoSense achieves SOTA performance across spatial reasoning tasks like VSI-Bench and MindCube[cite: 92]. For example, on the challenging BLINK benchmark, our method achieves a remarkable gain (+35.4) compared to the baseline[cite: 564, 657].</li>
-            <li><strong>General Visual Reasoning:</strong> The model maintains robust general-purpose reasoning[cite: 174]. By dynamically reverting to standard 2D and textual embedding combinations, it effectively mitigates cross-modal interference typically caused by redundant geometric features in non-spatial contexts[cite: 561, 562].</li>
+            <li><strong>Spatial Reasoning:</strong> For instance, in the BLINK benchmark, which comprises diverse spatial subtasks with varying dependencies on geometric relations, our model attains the highest overall score. </li>
+            <li><strong>General Visual Reasoning:</strong> For general visual tasks, our model tends to suppress redundant interference. The system effectively mitigates cross-modal interference typically caused by redundant geometric features in non-spatial contexts. </li>
         </ul>
     </div>
 
@@ -90,5 +84,4 @@
     </div>
 
 </body>
-
 </html>
