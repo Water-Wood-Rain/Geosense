@@ -3,84 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</title> <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #fafafa; }
+    <title>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</title> 
+    <style>
+        /* 去掉了 body 的内边距，为了让顶部背景能够撑满容器 */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: 0 auto; padding: 0; background-color: #fafafa; }
+        
+        /* 顶部横幅背景区 (Hero Section) */
+        .hero {
+            position: relative;
+            padding: 60px 20px 40px;
+            text-align: center;
+            /* 提高不透明度：将白色渐变的不透明度从 0.88/0.95 提高到 0.96/0.98 */
+            background: linear-gradient(rgba(250, 250, 250, 0.85), rgba(250, 250, 250, 0.98)), url('static/figure1.png');
+            background-size: cover;
+            background-position: center top;
+            border-bottom: 1px solid #eaeaea;
+            margin-bottom: 40px;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
         h1, h2, h3 { color: #2c3e50; text-align: center; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .authors { text-align: center; font-size: 1.2em; color: #34495e; margin-bottom: 20px; }
+        h1 { font-size: 2.2em; margin-bottom: 15px; line-height: 1.3; }
+        
+        /* 作者与标注样式 */
+        .authors { text-align: center; font-size: 1.2em; color: #34495e; margin-bottom: 5px; }
+        /* 1. 蓝色系标注图标 */
+        .authors sup { color: #2980b9; margin-left: 2px; font-weight: bold; }
+        .author-notes { text-align: center; font-size: 0.9em; color: #7f8c8d; margin-bottom: 25px; }
+        /* 标注图例也换成蓝色 */
+        .author-notes sup { color: #2980b9; font-weight: bold; }
+        
         .conference { text-align: center; font-size: 1.1em; color: #7f8c8d; font-style: italic; margin-bottom: 30px; }
-        .links { text-align: center; margin-bottom: 40px; }
-        .links a { display: inline-block; margin: 0 10px; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px; transition: background-color 0.3s; }
+        .links { text-align: center; margin-bottom: 10px; }
+        .links a { display: inline-block; margin: 0 10px; padding: 8px 18px; background-color: #3498db; color: white; text-decoration: none; border-radius: 20px; transition: background-color 0.3s; font-size: 0.95em; }
         .links a:hover { background-color: #2980b9; }
-        .section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .abstract-text { text-align: justify; }
-        .figure { text-align: center; margin: 20px 0; }
-        .figure img { max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .figure figcaption { margin-top: 10px; font-size: 0.9em; color: #7f8c8d; }
-        code { background-color: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
-        .bibtex { background-color: #f8f9fa; padding: 15px; border: 1px solid #e9ecef; border-radius: 5px; font-family: monospace; white-space: pre-wrap; text-align: left; }
+        
+        /* 给正文内容加回边距 */
+        .content-wrapper { padding: 0 20px 40px; }
+        
+        .section { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 40px; }
+        .abstract-text { text-align: justify; font-size: 1.05em; }
+        
+        /* 针对普通图片的专项优化 (Figure 2 等) */
+        .figure { text-align: center; margin: 40px 0; width: 100%; }
+        .figure img { 
+            width: 100%; 
+            max-width: 100%; 
+            height: auto; 
+            object-fit: contain; 
+            border-radius: 8px; 
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08); 
+            background-color: white; 
+            display: block;
+        }
+        .figure figcaption { margin-top: 15px; font-size: 0.95em; color: #555; text-align: justify; padding: 0 10px; }
+        
+        /* ----------------------------------------------------------- */
+        /* 3. 新增：Abstract 与 Figure 1 并排布局的 CSS */
+        /* ----------------------------------------------------------- */
+        .abstract-container {
+            display: flex;
+            align-items: flex-start; /* 顶部对齐 */
+            gap: 30px; /* 图与文字的间距 */
+        }
+        
+        /* 缩小原来的 Figure 1 大小并放在左侧 */
+        .abstract-figure {
+            flex: 0 0 35%; /* 占用约 35% 的宽度 */
+            margin: 0;
+            margin-top: 60px; /* 让图片稍微往下靠一点，对齐文字部分 */
+        }
+        
+        .abstract-figure img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 柔和阴影 */
+            background-color: white;
+            display: block;
+        }
+        
+        .abstract-figure figcaption {
+            font-size: 0.85em;
+            margin-top: 10px;
+            text-align: left;
+            padding: 0;
+        }
+        
+        /* 包含 H2 和 P 的文字容器 */
+        .abstract-text-container {
+            flex: 1; /* 占用剩余宽度 */
+        }
+        
+        /* 移动端适配：当屏幕小于 768px 时，图和文字改为上下堆叠 */
+        @media (max-width: 768px) {
+            .abstract-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .abstract-figure {
+                flex: 0 0 100%;
+                max-width: 80%; /* 手机上不要撑满，保持一点边距 */
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+            .abstract-figure figcaption {
+                text-align: center;
+            }
+        }
+        /* ----------------------------------------------------------- */
+        
+        code { background-color: #f4f4f4; padding: 3px 6px; border-radius: 4px; font-family: monospace; color: #e74c3c; }
+        .bibtex { background-color: #f8f9fa; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px; font-family: monospace; white-space: pre-wrap; text-align: left; font-size: 0.9em; overflow-x: auto; }
     </style>
 </head>
 <body>
 
-    <h1>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</h1>
-    <div class="authors">
-        Anonymous Authors </div>
-    <div class="conference">
-        Under review by the International Conference on Machine Learning (ICML) 2026 </div>
+    <div class="hero">
+        <h1>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</h1>
+        
+        <div class="authors">
+            Ruiheng Liu<sup>*</sup>, Haihong Hao<sup>*</sup>, Mingfei Han<sup>✉</sup>, Xin Gu, Kecheng Zhang, Changlin Li, Xiaojun Chang
+        </div>
+        <div class="author-notes">
+            <sup>*</sup> Equal contribution &nbsp;&nbsp;&nbsp; <sup>✉</sup> Corresponding author
+        </div>
 
-    <div class="links">
-        <a href="#">📝 Paper (PDF)</a>
-        <a href="#">💻 Code (GitHub)</a>
-        <a href="#">🗄️ Dataset</a>
+        <div class="conference">
+            Under review by the International Conference on Machine Learning (ICML) 2026 
+        </div>
+
+        <div class="links">
+            <a href="#">📝 Paper (PDF)</a>
+            <a href="#">💻 Code (GitHub)</a>
+            <a href="#">🗄️ Dataset</a>
+        </div>
     </div>
 
-    <div class="figure">
-        <img src="static/figure1.png" alt="Adaptive Geometric Reasoning with GeoSense">
-        <figcaption>Figure 1: Adaptive Geometric Reasoning with GeoSense. GeoSense introduces an adaptive mechanism that requests geometric features only when necessary. </figcaption>
-    </div>
+    <div class="content-wrapper">
+        
+        <div class="section abstract-container">
+            
+            <div class="figure abstract-figure">
+                <img src="static/figure1.png" alt="Adaptive Geometric Reasoning with GeoSense">
+                <figcaption>Figure 1: Adaptive Geometric Reasoning with GeoSense. GeoSense introduces an adaptive mechanism that requests geometric features only when necessary. </figcaption>
+            </div>
+            
+            <div class="abstract-text-container">
+                <h2>Abstract</h2>
+                <p class="abstract-text">
+                    Advancing towards artificial superintelligence requires rich and intelligent perceptual capabilities. A critical frontier in this pursuit is overcoming the limited spatial understanding of Multimodal Large Language Models (MLLMs), where geometry information is essential. Existing methods often address this by rigidly injecting geometric signals into every input, while ignoring their necessity and adding computation overhead. </p>
+                <p class="abstract-text">
+                    Contrary to this paradigm, our framework endows the model with an awareness of perceptual insufficiency, empowering it to autonomously engage geometric features in reasoning when 2D cues are deemed insufficient. To achieve this, we first introduce an independent geometry input channel to the model architecture and conduct alignment training, enabling the effective utilization of geometric features. Subsequently, to endow the model with perceptual awareness, we curate a dedicated spatial-aware supervised fine-tuning dataset. This serves to activate the model's latent internal cues, empowering it to autonomously determine the necessity of geometric information. Experiments across multiple spatial reasoning benchmarks validate this approach, demonstrating significant spatial gains without compromising 2D visual reasoning capabilities, offering a path toward more robust, efficient and self-aware multi-modal intelligence. </p>
+            </div>
+        </div>
 
-    <div class="section">
-        <h2>Abstract</h2>
-        <p class="abstract-text">
-            Advancing towards artificial superintelligence requires rich and intelligent perceptual capabilities. A critical frontier in this pursuit is overcoming the limited spatial understanding of Multimodal Large Language Models (MLLMs), where geometry information is essential. Existing methods often address this by rigidly injecting geometric signals into every input, while ignoring their necessity and adding computation overhead. </p>
-        <p class="abstract-text">
-            Contrary to this paradigm, our framework endows the model with an awareness of perceptual insufficiency, empowering it to autonomously engage geometric features in reasoning when 2D cues are deemed insufficient. To achieve this, we first introduce an independent geometry input channel to the model architecture and conduct alignment training, enabling the effective utilization of geometric features. Subsequently, to endow the model with perceptual awareness, we curate a dedicated spatial-aware supervised fine-tuning dataset. This serves to activate the model's latent internal cues, empowering it to autonomously determine the necessity of geometric information. Experiments across multiple spatial reasoning benchmarks validate this approach, demonstrating significant spatial gains without compromising 2D visual reasoning capabilities, offering a path toward more robust, efficient and self-aware multi-modal intelligence. </p>
-    </div>
+        <div class="section">
+            <h2>Methodology</h2>
+            <p>
+                GeoSense dynamically modulates its reliance on geometry input. The training framework consists of two main stages:
+            </p>
+            <ul>
+                <li><strong>Independent Geometry Adaptation:</strong> We treat 3D geometry as an independent, on-demand modality. Both encoders extract features which are projected via dedicated MLP modules to a shared embedding space. </li>
+                <li><strong>Activating Internal Spatial Awareness:</strong> The model is trained to function as an adaptive cognitive gate. The model learns to dynamically evaluate visual input and the task intent. For tasks requiring high spatial precision, the model is trained to trigger a signal, i.e., <code>&lt;vggt&gt;</code>, to request geometric embeddings. If the signal is not triggered, the model suppresses the channel to maintain 2D visual reasoning purity. </li>
+            </ul>
+        </div>
 
-    <div class="section">
-        <h2>Methodology</h2>
-        <p>
-            GeoSense dynamically modulates its reliance on geometry input. The training framework consists of two main stages:
-        </p>
-        <ul>
-            <li><strong>Independent Geometry Adaptation:</strong> We treat 3D geometry as an independent, on-demand modality. Both encoders extract features which are projected via dedicated MLP modules to a shared embedding space. </li>
-            <li><strong>Activating Internal Spatial Awareness:</strong> The model is trained to function as an adaptive cognitive gate. The model learns to dynamically evaluate visual input and the task intent. For tasks requiring high spatial precision, the model is trained to trigger a signal, i.e., <code>&lt;vggt&gt;</code>, to request geometric embeddings. If the signal is not triggered, the model suppresses the channel to maintain 2D visual reasoning purity. </li>
-        </ul>
         <div class="figure">
             <img src="static/figure2.png" alt="Architectural Overview of GeoSense">
             <figcaption>Figure 2: Architectural Overview of GeoSense. We integrate a 3D visual geometry encoder alongside a standard 2D visual encoder. </figcaption>
         </div>
-    </div>
 
-    <div class="section">
-        <h2>Key Results</h2>
-        <p>
-            Our proposed model significantly outperforms the baseline Qwen2.5-VL-3B on spatial reasoning benchmarks under comparable training data scales. </p>
-        <ul>
-            <li><strong>Spatial Reasoning:</strong> For instance, in the BLINK benchmark, which comprises diverse spatial subtasks with varying dependencies on geometric relations, our model attains the highest overall score. </li>
-            <li><strong>General Visual Reasoning:</strong> For general visual tasks, our model tends to suppress redundant interference. The system effectively mitigates cross-modal interference typically caused by redundant geometric features in non-spatial contexts. </li>
-        </ul>
-    </div>
+        <div class="section">
+            <h2>Key Results</h2>
+            <p>
+                Our proposed model significantly outperforms the baseline Qwen2.5-VL-3B on spatial reasoning benchmarks under comparable training data scales. </p>
+            <ul>
+                <li><strong>Spatial Reasoning:</strong> For instance, in the BLINK benchmark, which comprises diverse spatial subtasks with varying dependencies on geometric relations, our model attains the highest overall score. </li>
+                <li><strong>General Visual Reasoning:</strong> For general visual tasks, our model tends to suppress redundant interference. The system effectively mitigates cross-modal interference typically caused by redundant geometric features in non-spatial contexts. </li>
+            </ul>
+        </div>
 
-    <div class="section">
-        <h2>BibTeX</h2>
-        <div class="bibtex">@article{geosense2026,
+        <div class="section">
+            <h2>BibTeX</h2>
+            <div class="bibtex">@article{geosense2026,
   title={GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning},
-  author={Anonymous Authors},
+  author={Ruiheng Liu and Haihong Hao and Mingfei Han and Xin Gu and Kecheng Zhang and Changlin Li and Xiaojun Chang},
   journal={Under review by the International Conference on Machine Learning (ICML)},
   year={2026}
 }</div>
+        </div>
+        
     </div>
 
 </body>
