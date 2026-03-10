@@ -13,8 +13,7 @@
             position: relative;
             padding: 60px 20px 40px;
             text-align: center;
-            /* 提高不透明度：将白色渐变的不透明度从 0.88/0.95 提高到 0.96/0.98 */
-            background: linear-gradient(rgba(250, 250, 250, 0.85), rgba(250, 250, 250, 0.98)), url('static/figure1.png');
+            background: linear-gradient(rgba(250, 250, 250, 0.96), rgba(250, 250, 250, 0.86)), url('static/figure1.png');
             background-size: cover;
             background-position: center top;
             border-bottom: 1px solid #eaeaea;
@@ -26,12 +25,15 @@
         h1, h2, h3 { color: #2c3e50; text-align: center; }
         h1 { font-size: 2.2em; margin-bottom: 15px; line-height: 1.3; }
         
-        /* 作者与标注样式 */
-        .authors { text-align: center; font-size: 1.2em; color: #34495e; margin-bottom: 5px; }
-        /* 1. 蓝色系标注图标 */
+        /* 作者、单位与标注样式 */
+        .authors { text-align: center; font-size: 1.2em; color: #34495e; margin-bottom: 10px; }
         .authors sup { color: #2980b9; margin-left: 2px; font-weight: bold; }
+        
+        /* 新增：单位样式 */
+        .affiliations { text-align: center; font-size: 1.05em; color: #5a6c7d; margin-bottom: 20px; line-height: 1.5; }
+        .affiliations sup { color: #2980b9; margin-right: 2px; font-weight: bold; }
+        
         .author-notes { text-align: center; font-size: 0.9em; color: #7f8c8d; margin-bottom: 25px; }
-        /* 标注图例也换成蓝色 */
         .author-notes sup { color: #2980b9; font-weight: bold; }
         
         .conference { text-align: center; font-size: 1.1em; color: #7f8c8d; font-style: italic; margin-bottom: 30px; }
@@ -39,7 +41,7 @@
         .links a { display: inline-block; margin: 0 10px; padding: 8px 18px; background-color: #3498db; color: white; text-decoration: none; border-radius: 20px; transition: background-color 0.3s; font-size: 0.95em; }
         .links a:hover { background-color: #2980b9; }
         
-        /* 给正文内容加回边距 */
+        /* 正文内容区 */
         .content-wrapper { padding: 0 20px 40px; }
         
         .section { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 40px; }
@@ -59,26 +61,23 @@
         }
         .figure figcaption { margin-top: 15px; font-size: 0.95em; color: #555; text-align: justify; padding: 0 10px; }
         
-        /* ----------------------------------------------------------- */
-        /* 3. 新增：Abstract 与 Figure 1 并排布局的 CSS */
-        /* ----------------------------------------------------------- */
+        /* Abstract 与 Figure 1 并排布局的 CSS */
         .abstract-container {
             display: flex;
-            align-items: flex-start; /* 顶部对齐 */
-            gap: 30px; /* 图与文字的间距 */
+            align-items: flex-start;
+            gap: 30px;
         }
         
-        /* 缩小原来的 Figure 1 大小并放在左侧 */
         .abstract-figure {
-            flex: 0 0 35%; /* 占用约 35% 的宽度 */
+            flex: 0 0 35%;
             margin: 0;
-            margin-top: 60px; /* 让图片稍微往下靠一点，对齐文字部分 */
+            margin-top: 60px;
         }
         
         .abstract-figure img {
             width: 100%;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* 柔和阴影 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             background-color: white;
             display: block;
         }
@@ -90,12 +89,11 @@
             padding: 0;
         }
         
-        /* 包含 H2 和 P 的文字容器 */
         .abstract-text-container {
-            flex: 1; /* 占用剩余宽度 */
+            flex: 1;
         }
         
-        /* 移动端适配：当屏幕小于 768px 时，图和文字改为上下堆叠 */
+        /* 移动端适配 */
         @media (max-width: 768px) {
             .abstract-container {
                 flex-direction: column;
@@ -103,7 +101,7 @@
             }
             .abstract-figure {
                 flex: 0 0 100%;
-                max-width: 80%; /* 手机上不要撑满，保持一点边距 */
+                max-width: 80%;
                 margin-top: 0;
                 margin-bottom: 20px;
             }
@@ -111,7 +109,6 @@
                 text-align: center;
             }
         }
-        /* ----------------------------------------------------------- */
         
         code { background-color: #f4f4f4; padding: 3px 6px; border-radius: 4px; font-family: monospace; color: #e74c3c; }
         .bibtex { background-color: #f8f9fa; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px; font-family: monospace; white-space: pre-wrap; text-align: left; font-size: 0.9em; overflow-x: auto; }
@@ -123,15 +120,23 @@
         <h1>GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning</h1>
         
         <div class="authors">
-            Ruiheng Liu<sup>*</sup>, Haihong Hao<sup>*</sup>, Mingfei Han<sup>✉</sup>, Xin Gu, Kecheng Zhang, Changlin Li, Xiaojun Chang
+            Ruiheng Liu<sup>1, *</sup>, Haihong Hao<sup>1, *</sup>, Mingfei Han<sup>2, ✉</sup>, Xin Gu<sup>3</sup>, Kecheng Zhang<sup>1</sup>, Changlin Li<sup>4</sup>, Xiaojun Chang<sup>1</sup>
         </div>
+        
+        <div class="affiliations">
+            <sup>1</sup> University of Science and Technology of China &nbsp;&nbsp;&nbsp; 
+            <sup>2</sup> Mohamed bin Zayed University of Artificial Intelligence <br>
+            <sup>3</sup> University of Chinese Academy of Sciences &nbsp;&nbsp;&nbsp;
+            <sup>4</sup> Stanford University
+        </div>
+
         <div class="author-notes">
             <sup>*</sup> Equal contribution &nbsp;&nbsp;&nbsp; <sup>✉</sup> Corresponding author
         </div>
 
-        <div class="conference">
+        <!-- <div class="conference">
             Under review by the International Conference on Machine Learning (ICML) 2026 
-        </div>
+        </div> -->
 
         <div class="links">
             <a href="#">📝 Paper (PDF)</a>
@@ -143,7 +148,6 @@
     <div class="content-wrapper">
         
         <div class="section abstract-container">
-            
             <div class="figure abstract-figure">
                 <img src="static/figure1.png" alt="Adaptive Geometric Reasoning with GeoSense">
                 <figcaption>Figure 1: Adaptive Geometric Reasoning with GeoSense. GeoSense introduces an adaptive mechanism that requests geometric features only when necessary. </figcaption>
