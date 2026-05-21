@@ -1,0 +1,50 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+*cpython-310*
+*cpython-312*
+
+# Local environments and caches
+.cache/
+cache/
+.env
+.venv/
+
+# Local data and checkpoints
+/data/
+/ckpt_saves/
+/debug_output/
+/train_output/
+/trainer_output/
+/test_output/
+/datagenerate_rlColdStartOutput/
+
+# Runtime logs and generated outputs
+/logs/
+/outputs/
+/generatedData/
+/generatedData_old/
+/rdgeneratedData/
+/rgeneratedData/
+/wandb/
+/ab_exp_output/
+/scripts/logs/
+
+# Local editor/agent state
+.claude/
+.vscode/
+
+# Temporary/debug files
+*tmp
+/tmp*/
+nohup.out
+runtime_bad_batches.jsonl
+debug_truncation_result.json
+vggt_values.txt
+vggt_vsibench_debug*.jsonl
+
+# Local backup copies
+*.bak
+*.backup*
+*backup*

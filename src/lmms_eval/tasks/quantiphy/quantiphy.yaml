@@ -1,0 +1,69 @@
+# dataset_path: parquet
+# dataset_kwargs:
+#   data_files:
+#     # 修改这里：指向你上传的那个 parquet 文件的绝对路径
+#     validation: "data/evaluation/quantiphy/validation_dataset.parquet"
+  
+# task: "quantiphy"
+# test_split: validation
+# output_type: generate_until
+
+# # 绑定 Python 函数
+# doc_to_visual: !function utils.quantiphy_doc_to_visual
+# doc_to_text: !function utils.quantiphy_doc_to_text
+# doc_to_target: "answer" 
+
+# # 生成参数建议：物理数值推理建议使用贪婪搜索 (Greedy)
+# generation_kwargs:
+#   max_new_tokens: 64
+#   temperature: 0
+#   top_p: 1.0
+#   do_sample: false
+
+# # 结果处理
+# process_results: !function utils.quantiphy_process_results
+
+# # 定义指标：这里我们同时计算三个阈值的准确率
+# metric_list:
+#   - metric: mra_05
+#     aggregation: !function utils.quantiphy_aggregate_results
+#     higher_is_better: true
+#   - metric: mra_10  # 这是 QuantiPhy 论文通常使用的标准
+#     aggregation: !function utils.quantiphy_aggregate_results
+#     higher_is_better: true
+#   - metric: mra_20
+#     aggregation: !function utils.quantiphy_aggregate_results
+#     higher_is_better: true
+
+# metadata:
+#   - version: 1.0
+
+dataset_path: parquet
+dataset_kwargs:
+  data_files:
+    validation: "data/evaluation/quantiphy/validation_dataset.parquet"
+  
+task: "quantiphy"
+test_split: validation
+output_type: generate_until
+
+doc_to_visual: !function utils.quantiphy_doc_to_visual
+doc_to_text: !function utils.quantiphy_doc_to_text
+doc_to_target: "answer" 
+
+generation_kwargs:
+  max_new_tokens: 64
+  temperature: 0
+  top_p: 1.0
+  do_sample: false
+
+process_results: !function utils.quantiphy_process_results
+
+metric_list:
+  # 只有一个综合指标
+  - metric: quantiphy_mra
+    aggregation: !function utils.quantiphy_aggregate_results
+    higher_is_better: true
+
+metadata:
+  - version: 2.0 # Logic Updated
