@@ -10,7 +10,7 @@ GeoSense is a multimodal reasoning framework that teaches MLLMs to decide when 3
 - Project page: https://water-wood-rain.github.io/Geosense/
 - Model checkpoint: https://huggingface.co/Henry012/GeoSense
 - Repository: https://github.com/Water-Wood-Rain/Geosense
-- Paper PDF: [assets/geosense_icml2026.pdf](assets/geosense_icml2026.pdf)
+- Paper PDF: https://arxiv.org/abs/2603.10370
 
 ## News
 
