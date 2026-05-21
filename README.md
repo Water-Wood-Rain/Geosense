@@ -1,314 +1,194 @@
-# Learning from Videos for 3D World: Enhancing MLLMs with 3D Vision Geometry Priors
+# GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning
 
-<div align="center" margin-bottom="3em">
-<a href="https://arxiv.org/abs/2505.24625" target="_blank">
-<img src="https://img.shields.io/badge/arXiv-VG_LLM-green" alt="arXiv"></a>
-<a href="assets/VG_LLM_Neurips_2025.pdf" target="_blank">
-<img src="https://img.shields.io/badge/Paper-VG_LLM-orange" alt="Paper"></a>
-<a href="https://lavi-lab.github.io/VG-LLM/" target="_blank">
-    <img alt="Website" src="https://img.shields.io/badge/Website-VG_LLM-blue.svg" height="20" />
-</a>
-<a href="https://huggingface.co/datasets/zd11024/VG-LLM-Data" target="_blank">
-    <img alt="Data" src="https://img.shields.io/badge/Data-VG_LLM-yellow.svg" height="20" />
-</a>
+[![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://water-wood-rain.github.io/Geosense/)
+[![Model](https://img.shields.io/badge/HuggingFace-GeoSense-yellow)](https://huggingface.co/Henry012/GeoSense)
+[![Code](https://img.shields.io/badge/GitHub-Code-black)](https://github.com/Water-Wood-Rain/Geosense)
+[![License](https://img.shields.io/badge/License-Apache--2.0-green)](https://huggingface.co/Henry012/GeoSense)
 
-</div>
-&nbsp
+GeoSense is a multimodal reasoning framework that teaches MLLMs to decide when 3D geometry is actually necessary. Instead of rigidly injecting geometric features into every input, GeoSense keeps geometry as an independent, on-demand information channel and invokes it only when standard 2D visual perception is insufficient.
 
-<div align="center" margin-bottom="3em">
-<a target="_blank" href="https://github.com/zd11024">Duo Zheng<sup>*</sup></a>,
-<a target="_blank" href="https://sega-hsj.github.io/">Shijia Huang<sup>*</sup></a>, 
-<a target="_blank" href="https://github.com/lyy1994">Yanyang Li</a> and 
-<a target="_blank" href="https://lwwangcse.github.io/">Liwei Wang<sup>&ddagger;</sup></a>
+- Project page: https://water-wood-rain.github.io/Geosense/
+- Model checkpoint: https://huggingface.co/Henry012/GeoSense
+- Repository: https://github.com/Water-Wood-Rain/Geosense
+- Paper PDF: [assets/geosense_icml2026.pdf](assets/geosense_icml2026.pdf)
 
-<sup>*</sup>Equal contribution.
-<sup>&ddagger;</sup> Corresponding author.
+## News
 
-<strong>
-The Chinese University of Hong Kong<br>
-</strong>
-</div>
-&nbsp;
+- 2026-05-21: Initial GeoSense source release.
+- 2026-05-21: GeoSense model checkpoint is available on Hugging Face.
 
-Previous research has investigated the application of Multimodal Large Language
-Models (MLLMs) in understanding 3D scenes by interpreting them as videos.
-These approaches generally depend on comprehensive 3D data inputs, such as
-point clouds or reconstructed Bird’s-Eye View (BEV) maps. In our research, we
-advance this field by enhancing the capability of MLLMs to understand and reason
-in 3D spaces directly from video data, without the need for additional 3D input.
+## Overview
 
-## 📢News
-* [2025-09-23] We release the 7B size models fintuned on Qwen2.5-VL-7B-Instruct, which achieve better performance and inference speed. Check out our latest revision [here](assets/VG_LLM_Neurips_2025.pdf).
-* [2025-09-18] Our paper has been accepted by NeurIPS 2025!
+Current spatial MLLMs often use a tightly coupled design: they either ignore geometric information or fuse it into every sample. This is inefficient and can be harmful, because geometry is not universally useful. Some tasks require precise 3D cues, while OCR, chart reasoning, object recognition, or general VQA may be degraded by unnecessary geometric signals.
 
+GeoSense addresses this with an internal geometry-necessity mechanism:
 
-## ✨Architecture Overview
-
-VG-LLM integrates a 3D visual geometry encoder (based on [VGGT](https://github.com/facebookresearch/vggt)) with a conventional 2D visual encoder.
-1.  Input video frames are processed by both encoders. The 2D encoder extracts semantic-aware visual features from individual images. The 3D visual geometry encoder processes the sequence to produce globally geometry-aware visual features, capturing inter-frame correspondences.
-2.  Features from both encoders are fused at the patch level.
-3.  These fused, geometry-augmented visual features, along with text embeddings of a question, are fed into an MLLM backbone ([Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL)) to generate a response.
+1. A standard 2D visual encoder and a 3D geometry encoder are kept as separate feature sources.
+2. Dedicated projectors align 2D and 3D features into the MLLM embedding space.
+3. The model first reasons from text and 2D visual input.
+4. If its internal state determines that geometric information is needed, it emits a geometry trigger token, `<vggt>`.
+5. The system then performs a geometry-aware second pass with 3D embeddings; otherwise it keeps the geometry channel closed.
 
 <p align="center">
-    <img src="assets/model.png" width="80%"><br>
-    <figcaption align="center">The architecture of our VG LLM.</figcaption>
+  <a href="https://water-wood-rain.github.io/Geosense/">
+    <img src="static/figure1.png" width="88%" alt="Adaptive geometric reasoning with GeoSense">
+  </a>
 </p>
 
+## Method
 
-## 🚀Main Results Highlights
-* **3D Visual Grounding (ScanRefer):** Our
-8B model achieves an accuracy of 41.6% at an IoU threshold of 0.25, surpassing the 31.9% accuracy
-of SPAR by a significant margin of 9.7 points.
+GeoSense uses a two-stage training pipeline.
 
-    <p align="center">
-        <img src="assets/3d_results.png" width="80%"><br>
-    </p>
+### Independent Geometry Adaptation
 
-* **3D Dense Captioning (Scan2Cap):** Achieves 80.0 C@0.5 and 41.5 B-4@0.5, which are comparable
-to previous SOTA approaches.
+GeoSense uses Qwen2.5-VL as the base multimodal model and VGGT-1B as the 3D geometry foundation model. Unlike additive or always-on fusion, GeoSense treats geometry as an independent input sequence. The 2D visual encoder and 3D geometry encoder are frozen, while projection layers and the LLM backbone are optimized so geometry tokens can be interpreted in the same multimodal embedding space.
 
-* **3D Video Object Detection (curated from EmbodiedScan):** Shows significant recall improvement (e.g., +19.3 F1 for common classes in 6-frame setting) by better handling egocentric-allocentric transformations.
+### Spatial-Aware Supervised Fine-Tuning
 
-    <!-- <p align="center">
-        <img src="assets/det_results.png" width="90%"><br>
-    </p> -->
+The second stage activates internal spatial awareness. GeoSense is trained to decide whether a sample needs geometry by learning from dual-condition inference: predictions are compared with and without geometry features. Samples where 3D cues are essential are converted into training signals that request geometry through `<vggt>`, while samples where geometry behaves as noise are used to teach suppression of the geometry channel.
 
-* **Spatial Reasoning (VSI-Bench):** Archieves an average score of 50.7%, surpassing Gemini-1.5-Pro.
-
-* **Effect of Geometry and Data Composition:** The results show consistent gains after integrating the 3D geometry into the model architecture with the
-different data compositions.
-
-    <p align="center">
-        <img src="assets/ablation_study.png" width="80%"><br>
-    </p>
-
-<details>
-<summary>Visualization results of VG LLM in 3D visual grounding tasks.</summary>
 <p align="center">
-    <img src="assets/vg.png" width="90%"><br>
-    <figcaption align="center">Our model can identify the frame index in which the targer object appears in a video stream, as well as its oriented 3D bounding box in the current frame. In this illustration, we show the video, the model's predicted oriented 3D bounding boxes (highlighted in green), and the ground truth 3D oriented bounding boxes (highlighted in blue). As shown in the figure, our model can effectively identify spatial relationships such as "far away," "opposite," and "next to" based on the video input.</figcaption>
+  <img src="static/figure2.png" width="92%" alt="GeoSense architecture">
 </p>
-</details>
 
-<details>
-<summary>Visualization results of VG LLM in 3D video object detection.</summary>
-<p align="center">
-    <img src="assets/det.png" width="90%"><br>
-    <figcaption align="center">Our model can identify all objects througtout a video and output their oriented 3D bounding boxes in the unified coordinate system. As shown in the figure, our model can effectively detect objects of different granularities, including sink, bin, telephone, etc., and output their bounding boxes in a unified coordinate system.</figcaption>
-</p>
-</details>
+## Results
 
+GeoSense is evaluated on both spatial reasoning and general visual reasoning benchmarks. The goal is not only to improve spatial tasks, but also to preserve general multimodal reasoning when geometry is unnecessary.
 
-## ⚙️Setup
+| Model | Spatial Avg. | General Avg. | Overall Avg. | Notes |
+| --- | ---: | ---: | ---: | --- |
+| Qwen2.5-VL-3B | 43.4 | 53.3 | 48.3 | Base MLLM |
+| Qwen2.5-VL-7B | 50.5 | 57.8 | 54.1 | Larger general baseline |
+| VG-LLM | 49.7 | 52.0 | 50.9 | Always-on geometry fusion |
+| GeoSense | **56.6** | **55.2** | **55.9** | Adaptive geometry usage |
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/lavi-lab/VG-LLM](https://github.com/lavi-lab/VG-LLM)
-    cd VG-LLM
-    ```
+On the reported benchmark suite, GeoSense reaches the best overall average while improving spatial reasoning without collapsing general visual capability. The ablation study also shows that adaptive geometry insertion uses geometry for only part of the data while outperforming always-on fusion on key spatial tasks.
 
-2.  **Create a Conda environment and install dependencies:**
-    We recommend using Python 3.10.
-    ```bash
-    conda create -n geos python=3.10
-    conda activate geos
-    pip install -e .
-    ```
+## Installation
 
+Create the public release environment named `geos`:
 
-## 📊Datasets
+```bash
+conda create -n geos python=3.10
+conda activate geos
+pip install -r requirements.txt
+pip install -e . --no-deps
+```
 
-VG-LLM is trained and evaluated on a variety of datasets:
+The implementation expects CUDA-capable GPUs for training and multi-GPU evaluation. The training scripts were developed for distributed execution with `torchrun` and DeepSpeed.
 
-* **3D Scene Understanding:**
-    * **3D Visual Grounding:** [ScanRefer](https://github.com/daveredrum/ScanRefer), with 24 uniformly sampling frames per scene.
-    * **3D Dense Captioning:** [Scan2Cap](https://github.com/daveredrum/Scan2Cap), using Mask3D-detected object proposals extracted from [LEO](https://github.com/embodied-generalist/embodied-generalist). We uniformly sample 16 frames for each scene.
-    * **3D Video Object Detection:** Curated from [EmbodiedScan](https://github.com/OpenRobotLab/EmbodiedScan), with consecutive frames sampled at 1 FPS.
-* **Spatial Reasoning Instruction Tuning:**
-    * [SPAR-7M](https://huggingface.co/datasets/jasonzhango/SPAR-7M): We used a subset of ~234K samples (3% of original). Data prep follows official codebase, navigation type discarded.
-    * [LLaVA-Video-178K (LLaVA-Hound split)](https://huggingface.co/datasets/lmms-lab/LLaVA-Video-178K): We used a subset of ~63K samples (25% of original). Frames sampled at 2 FPS, 4-8 frames total.
-    * Evaluation Benchmarks: We adopt [VSI-Bench](https://huggingface.co/datasets/nyu-visionx/VSI-Bench), [CV-Bench](https://huggingface.co/datasets/nyu-visionx/CV-Bench), [BLINK](https://huggingface.co/datasets/BLINK-Benchmark/BLINK), [Video-MME](https://huggingface.co/datasets/lmms-lab/Video-MME), [TempCompass](https://huggingface.co/datasets/lmms-lab/TempCompass), [NextQA](https://huggingface.co/datasets/lmms-lab/NExTQA) for evaluation.
+## Model Checkpoint
 
+Download the released checkpoint from Hugging Face:
 
-## Finetuned Models
-Our models are built upon two variants of Qwen2.5-VL, [Qwen2.5-VL—3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-3B-Instruct)and [Qwen2.5-VL-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct), and are integrated with VGGT-1B as the 3D geometry encoder. 
-We recommend adopting the 7B model as the backbone, as our experiments show it delivers both superior performance and faster inference speed.
+```text
+https://huggingface.co/Henry012/GeoSense
+```
 
-| | Model Access |
-|---|---|
-| 3D Scene Understanding | [🤗VG LLM-3D-4B](https://huggingface.co/zd11024/geos-3d-vggt-4b)<br>[🤗VG LLM-3D-8B](https://huggingface.co/zd11024/geos-3d-vggt-8b) |
-| Spatial Reasoning | [🤗VG LLM-QA-4B](https://huggingface.co/zd11024/geos-qa-vggt-4b)<br>[🤗VG LLM-QA-8B](https://huggingface.co/zd11024/geos-qa-vggt-8b) |
-
-## Demo
-* Download the demo data at this [link](https://huggingface.co/datasets/zd11024/VGLLM_demo_data) and place it at `data/demo_data`.
-* Download the required model checkpoints according to the last section.
-* Run the script `demo.ipynb`.
-
+Use the downloaded checkpoint path as `<PATH_TO_GEOS_CHECKPOINT>` in evaluation scripts and `<PATH_TO_INITIAL_GEOS_CHECKPOINT>` in training scripts when continuing fine-tuning.
 
 ## Data Preparation
 
-### 1. Structure
-Before starting the training process, you need to download the required datasets and annotations according to the following folder structure.
-```
-data
-├── evaluation
-│   ├── scan2cap
-│   ├── scanrefer
-│   └── threedod
-├── media
-│   ├── llava_hound
-│   ├── scannet
-│   └── spar
-└── train
-    ├── llava_hound_255k.json
-    ├── llava_hound_64k.json
-    ├── scan2cap_train_16frames.json
-    ├── scannet_det_train_4frames.json
-    ├── scanrefer_train_24frames.json
-    ├── spar_234k.json
-    └── spar_7m.jsonl
-```
+This repository should contain code and lightweight JSON/JSONL annotations only. Raw images, videos, extracted frames, logs, generated outputs, and checkpoints should not be committed.
 
-### 2. Data for 3D Scene Understanding
-  * **Annotations:** Download the annotation files from [VG-LLM-Data](https://huggingface.co/datasets/zd11024/VG-LLM-Data).
-  * **Media Data:** Prepare preprocessed video frames following the instruction of [Video-3D LLM](https://github.com/LaVi-Lab/Video-3D-LLM/blob/main/scripts/3d/preprocessing/README.md).
+Recommended local layout:
 
-### 3. Data for Spatial Reasoning
-  * **Annotations:** Download the annotation files from [VG-LLM-Data](https://huggingface.co/datasets/zd11024/VG-LLM-Data).
-  * **Video Data:** Download the media data of LLaVA-Video-178K (LLaVA-Hound split) from the [ShareGPTVideo](https://huggingface.co/datasets/ShareGPTVideo/train\_video\_and\_instruction/tree/main/train\_300k).
-  * **SPAR Data:** Download the media data of SPAR from [SPAR-7M](https://huggingface.co/datasets/jasonzhango/SPAR-7M).
-
-
-We have provided two example entries as follows
-<details>
-<summary>Example for LLaVA-Video-178K (LLaVA-Hound Split).</summary>
-
-```json
-{
-    "id": "23230678_1",
-    "conversations": [
-        {
-            "from": "human",
-            "value": "<video>\nWhat is the contrast provided in the video's midway point?"
-        },
-        {
-            "from": "gpt",
-            "value": "In the midway point of the video, a handgun is displayed on a surface covered with documents, providing a stark contrast to the earlier images of the cigarette being inhaled."
-        }
-    ],
-    "data_source": "llava_hound",
-    "video": "llava_hound/frames/23230678"
-}
+```text
+data/
+|-- train/
+|   |-- spar_234k.json
+|   |-- llava_hound_64k.json
+|   |-- scannet_det_train_4frames.json
+|   |-- scanrefer_train_32frames.json
+|   |-- scan2cap_train_32frames.json
+|   `-- vsi_590k_alig_fixed.jsonl
+`-- media/
+    |-- spar/
+    |-- llava_hound/
+    |-- scannet/
+    |-- VSI-590K/
+    `-- MindCube/
 ```
 
-</details>
+Dataset registry entries are defined in `src/qwen_vl/data/__init__.py`. The first four placeholder entries in that file are not required for this release. For spatial reasoning experiments, use the JSON keys beginning from `spar`, such as `spar_234k`, `llava_hound_64k`, `scannet_det`, `scanrefer`, `scan2cap`, and the `vsi_*` entries.
 
-<details>
-<summary>Example for SPAR-7M.</summary>
+### Source Data Links
 
-```json
-{
-    "id": "scene0012_01_1661",
-    "conversations": [
-        {
-            "from": "human",
-            "value": "<image>\n<image>\n<image>\nAssume the depth of box (red point) is 2.0. How much deeper or shallower is chair (green point) relative to table (blue point), measured in meters? Calculate or judge based on the 3D center points of these objects. The depth is calculated based on the image where the markers corresponding to these objects are located. Provide a numeric response with just one value."
-        },
-        {
-            "from": "gpt",
-            "value": "1.5"
-        }
-    ],
-    "images": [
-        "spar/scannet/images/scene0012_01/image_color/2626.jpg",
-        "spar/scannet/images/scene0012_01/image_color/3321.jpg",
-        "spar/scannet/images/scene0012_01/image_color/133.jpg"
-    ],
-    "spar_info": "{\"red_point\": [[395, 89]], \"blue_point\": [[494, 620]], \"green_point\": [[878, 737]], \"point_img_idx\": [[0, 2, 1]], \"type\": \"depth_prediction_oo_mv\"}"
-}
+| Purpose | Source |
+| --- | --- |
+| GeoSense/VG-LLM annotation JSON files | https://huggingface.co/datasets/zd11024/VG-LLM-Data |
+| SPAR source data | https://huggingface.co/datasets/jasonzhango/SPAR-7M |
+| LLaVA-Video / LLaVA-Hound annotations | https://huggingface.co/datasets/lmms-lab/LLaVA-Video-178K |
+| ShareGPTVideo raw videos | https://huggingface.co/datasets/ShareGPTVideo/train_video_and_instruction/tree/main/train_300k |
+| VSI training/evaluation media | https://huggingface.co/datasets/nyu-visionx/VSI-590K |
+| VSI-Bench evaluation | https://huggingface.co/datasets/nyu-visionx/VSI-Bench |
+| CV-Bench evaluation | https://huggingface.co/datasets/nyu-visionx/CV-Bench |
+
+Place downloaded or preprocessed source media under `data/media/`, or update the corresponding `data_path` values in `src/qwen_vl/data/__init__.py`.
+
+## Evaluation
+
+The main evaluation entrypoint is:
+
+```bash
+bash scripts/evaluation/eval_geos_multi.sh
 ```
 
-</details>
+Before running, edit the script and set:
 
+```bash
+model_path="<PATH_TO_GEOS_CHECKPOINT>"
+benchmark="cvbench"  # or another task registered under src/lmms_eval/tasks
+```
 
-### 4. Configure Data Paths
+Internally the script launches:
 
-Next, you need to configure the data paths in the source code following Qwen-2.5-VL. Modify the `src/qwen_vl/data/__init__.py` file to ensure the script can locate your datasets.
+```bash
+accelerate launch -m lmms_eval \
+  --model geos_multi \
+  --model_args "pretrained=<PATH_TO_GEOS_CHECKPOINT>,use_flash_attention_2=true,max_num_frames=32,max_length=25600,stage=geos_multi" \
+  --tasks cvbench \
+  --batch_size 1
+```
 
-  * `annotation_path`: This should point to the JSON or JSONL file containing your downloaded dataset annotations.
-  * `data_path`: This can be left empty if the image and video paths specified in your annotation files are absolute paths. Otherwise, provide the directory where your data is stored.
+Evaluation outputs are written to `logs/`, which is intentionally ignored by Git.
 
 ## Training
 
-We train two models separately for 3D scene understanding and spatial reasoning tasks. The following instructions are for 3D scene understanidng.
-
-To start the training, execute the following script:
-
-```bash
-bash scripts/train/train_3d.sh
-```
-
-For spatial reasoning, run the following command:
+The main training entrypoint is:
 
 ```bash
 bash scripts/train/train_sr.sh
 ```
 
-#### Training Details
-  * **Backbones**: Our models are built upon two sizes of Qwen2.5-VL—3B and 7B, and integrated with VGGT-1B as the 3D geometry encoder.
-  * **Hardware:** Our experiments were conducted on a setup with 8x NVIDIA H800 (80G) GPUs.
-  * **Hyperparameters:** We trained the model for one epoch using the Adam optimizer with a batch size of 64, a warmup ratio of 0.03, and a learning rate of 1e-5.
-  * **Frozen Components:** During training, the visual encoder of the MLLM, the 3D geometry encoder, and the multimodal connector are kept frozen.
-  * **Training Duration:**
-      * 3D Scene Understanding: Approximately 12 hours for 8B model.
-      * Spatial Reasoning: Approximately 9 hours for 8B model.
+Before running, set:
 
-<!-- The training scripts will be released soon. -->
-## Evaluation
-
-Evaluation is performed using the [LMMs-Eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) with greedy sampling for generation. For video benchmarks, 32 frames are uniformly sampled for VSI-Bench.
-
-Please refer to the example evaluation script (`scripts/evaluation/eval.sh`) below for detailed command usage. You may need to adjust `model_path`, `benchmark`, or other parameters based on your specific setup and requirements.
 ```bash
-set -e
-export LMMS_EVAL_LAUNCHER="accelerate"
-
-export NCCL_NVLS_ENABLE=0
-benchmark=vsibench # choices: [vsibench, cvbench, blink_spatial]
-output_path=logs/$(TZ="Asia/Shanghai" date "+%Y%m%d")
-model_path=zd11024/geos-qa-vggt-8b
-
-accelerate launch --num_processes=8 -m lmms_eval \
-    --model geos \
-    --model_args pretrained=$model_path,use_flash_attention_2=true,max_num_frames=32,max_length=12800 \
-    --tasks ${benchmark} \
-    --batch_size 1 \
-    --output_path $output_path
+MODEL_PATH="<PATH_TO_INITIAL_GEOS_CHECKPOINT>"
+GEOMETRY_ENCODER_PATH="facebook/VGGT-1B"
+DATASETS="spar_234k"
 ```
 
-For 3D scene understanding, please refer to the script `scripts/evaluation/eval_3d.sh` for more details. Notice that for 3D visual grounding, a frame index are asked to insert in front of each frame by setting `add_frame_index` to `true`.
+The script launches `src/qwen_vl/train/train_qwen.py` with DeepSpeed config `scripts/zero2_opt.json`. Training outputs are written to `train_output/`, which is intentionally ignored by Git.
 
-## 📋Todo List
+## Repository Notes
 
-- [x] Release the model weights.
-- [x] Release the inference demo.
-- [x] Release the evaluation code, preprocessing data and training scripts for spatial reasoning.
-- [x] Release the evaluation code, preprocessing data and training scripts for 3D scene understanding.
+- Public runtime model name: `geos_multi`.
+- Public conda environment name: `geos`.
+- Checkpoints, raw media, generated data, logs, and WandB runs are excluded by `.gitignore`.
+- The project page is hosted from this repository and links back to the GitHub source release.
 
 ## Citation
 
-If you find our work useful, please consider citing:
-
 ```bibtex
-@article{zheng2025learning,
-  title={Learning from Videos for 3D World: Enhancing MLLMs with 3D Vision Geometry Priors},
-  author={Zheng, Duo and Huang, Shijia and Li, Yanyang and Wang, Liwei},
-  journal={arXiv preprint arXiv:2505.24625},
-  year={2025}
+@inproceedings{liu2026geosense,
+  title={GeoSense: Internalizing Geometric Necessity Perception for Multimodal Reasoning},
+  author={Liu, Ruiheng and Hao, Haihong and Han, Mingfei and Gu, Xin and Zhang, Kecheng and Li, Changlin and Chang, Xiaojun},
+  booktitle={International Conference on Machine Learning},
+  year={2026}
 }
 ```
 
 ## Acknowledgements
 
-* This work is built upon excellent previous research, including [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL), [VGGT](https://github.com/facebookresearch/vggt), [SPAR-7M](https://github.com/fudan-zvg/spar), [LLaVA-Video-178K](https://github.com/LLaVA-VL/LLaVA-NeXT), and various 3D datasets like [ScanNet](https://github.com/ScanNet/ScanNet), [ScanRefer](https://github.com/daveredrum/ScanRefer), [Scan2Cap](https://github.com/daveredrum/Scan2Cap), [EmbodiedScan](https://github.com/OpenRobotLab/EmbodiedScan).
-* We thank the developers of [LMMs-Eval](https://github.com/EvolvingLMMs-Lab/lmms-eval) for their evaluation framework.
+GeoSense builds on Qwen2.5-VL, VGGT, and the LMMS evaluation ecosystem. We thank the maintainers of the datasets and open-source models used in this project.
