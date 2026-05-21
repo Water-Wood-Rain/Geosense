@@ -171,12 +171,6 @@ DATASETS="spar_234k"
 
 The script launches `src/qwen_vl/train/train_qwen.py` with DeepSpeed config `scripts/zero2_opt.json`. Training outputs are written to `train_output/`, which is intentionally ignored by Git.
 
-## Repository Notes
-
-- Public runtime model name: `geos_multi`.
-- Public conda environment name: `geos`.
-- Checkpoints, raw media, generated data, logs, and WandB runs are excluded by `.gitignore`.
-- The project page is hosted from this repository and links back to the GitHub source release.
 
 ## Citation
 
