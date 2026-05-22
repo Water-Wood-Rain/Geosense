@@ -277,6 +277,10 @@
             color: var(--muted);
             font-size: 0.95rem;
         }
+        .architecture-figure img {
+            padding: 12px;
+            object-fit: contain;
+        }
         .results-grid {
             display: grid;
             grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
@@ -531,8 +535,8 @@
                     </div>
                 </div>
 
-                <figure class="figure">
-                    <img src="static/figure2pdf.svg" alt="GeoSense architecture overview">
+                <figure class="figure architecture-figure">
+                    <img src="static/figure2.png" alt="GeoSense architecture overview">
                     <figcaption>Architecture overview. The model first reasons from text and 2D visual tokens, then requests 3D geometry embeddings only when the internal decision indicates insufficiency.</figcaption>
                 </figure>
             </div>
